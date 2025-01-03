@@ -1,12 +1,12 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
+package ChangedClasses;//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class Cell {
+public class CellFuntions {
     public static void main(String args []) {
-        System.out.println(DividerbyAction("1*1/875*2+8-9*12"));
+        System.out.println(Calculate("()"));
     }
     public static boolean isNumber(String text) {
         boolean ans = true;
@@ -56,59 +56,70 @@ public class Cell {
         return ans;
     }
 
-    public static int ComputeForm(String text) throws Exception {
+    public static double ComputeForm(String text) throws Exception {
         //How formula can look like
         // 1+1,1+1*2/3, ((2*2+3)/2)*2
-        // Check which kind of formula it is
-        // In case there are no parentesies -> Calculate using regular rules
-        // In case there are parentasies  -> Calculate the last action -> Calculate how many actions left -> calculate the cell
-        int ans = 0;
-        if (text != null && !text.isEmpty()) {
+        double ans = 0;
+        if (text != null && !text.isEmpty() && !text.contains(" ")) {
             //Check if there are parenthasies
-            if (text.contains(")") || text.contains("(")) {
-            ////
+            try {
+                ans = Calculate(text);
+            } catch (ArithmeticException e) {
+                System.out.println("You cant divide by 0");
             }
-        } else throw new Exception("Invalid formula format");
+        } else throw new IllegalArgumentException("Invalid formula format");
         return ans;
     }
 
     //The function does this: "1*1/((875*2)+8-9*12)" -> 334 recursively untily gets rid of all the parenthasies
     public static double Calculate(String text) {
+        if (text.equals("") || text==null) {
+            throw new IllegalArgumentException();
+        }
+        String log = text;
         double ans = 0;
         ArrayList divided = DividerbyAction(text);
         ArrayList<Integer> indexbox = new ArrayList<>();
+        boolean torun = false;
         //In case there are parenthasies - find the last parenthasies and calculate the expression inside them
-        for (int i = 0; i<text.length(); i+=1) {
+        for (int i = 0; i<divided.size(); i+=1) {
             //In case while looping through the expression ( is found
-            while (Character.toString(text.charAt(i)).equals("(")) {
+            if ((divided.get(i)).equals("(")) {torun = true;}
+            while (torun) {
                 //Add the found ( index to the indexbox
                 indexbox.add(i);
                 //This loop will run unil it finds the closing ) or finds one more opening (
                 i+=1;
                 //Move one step further
                 //Check the option with nested expressions
-                ///TOMORROW DO THIS
+                if ((divided.get(i)).equals("(")) {
+                    //In case after the opening one we eventually find one more opening one
+                    //Just remove the part of the indexbox, so the first index would be the index with the last found (
+                    indexbox.clear();
+                }
                 //Check the option without nested expressions
-                if (Character.toString(text.charAt(i)).equals(")")) {
+                if ((divided.get(i)).equals(")")) {
                     int left_bound = indexbox.get(1);
                     int right_bound = i;
                     //At this stage this is found (1*2) , the indexes are pointing to 1*2
                     //Calculate this expression and turn it to double
-                    double result = Double.parseDouble(String.valueOf(Calculate(text)));
-                    //Remove the initial expression from the string
-                    StringBuffer textbuffer = new StringBuffer(text);
-                    textbuffer.delete(left_bound-1,right_bound+1);
+                    String expression = String.join("", divided.subList(left_bound,right_bound));
+                    double result = Double.parseDouble(String.valueOf(Calculate(expression)));
                     //Add the expression that we've calculated to a string
-                    textbuffer.insert(i,Double.toString(result));
-                    text = textbuffer.toString();
+                    divided.set(left_bound-1,Double.toString(result));
+                    //Remove the initial expression from the string
+                    divided.subList(left_bound,right_bound+1).clear();
+                    text = String.join("",divided);
                     //Clean the indexbox
+                    System.out.println("Current indexbox: " + indexbox);
                     indexbox.clear();
+                    torun = false;
                     //Pass further into the recursion loop
-                    Calculate(text);
+                    double res = Calculate(text);
+                    System.out.println("The following string extracted --> " + log.substring(left_bound,right_bound+1) + " from " + divided );
+                    return res;
                 }
         }
-            //Go through the text and check whether the parenthasies exist, if one is fo und -- >> check whether there is a closing one on the way, if yes -calculate the expression, if another opening one if found on the way - repeat the process4
-            //After the expression was replaced by a value - run the function calculate one more time on a result (recursion)
         }
         //Return the result of a looper (array) turned into string and parse Double'ed after.
         ans = Double.parseDouble(looper(divided).get(0).toString());
@@ -125,7 +136,7 @@ public class Cell {
         }
         //Add one ~ at a last index for further logic
         symbols.add("~");
-        System.out.println("Before consolidation"+symbols);
+        //System.out.println("Before consolidation"+symbols);
         //Consolidate the digits in the list [2,5] -> [25]
         String digits = "0123456789.";
         StringBuilder str = new StringBuilder();
@@ -135,7 +146,7 @@ public class Cell {
             if (digits.contains(symbols.get(i))) {
                 //Add the digit to a stringbuilder
                 str.append(symbols.get(i));
-                System.out.println(str);
+                //System.out.println(str);
                 //Add it to the indexes list
                 indexes.add(i);
                 //Replace the digit with null
@@ -143,7 +154,7 @@ public class Cell {
                     symbols.set(i, null);
                 }
             } else {
-                System.out.println(indexes);
+                //System.out.println(indexes);
                 //In case we are not a digit index in symbols - we should check whether the digit containing operation has happened in the past - Indexes list shouldn't be empty
                 if (!indexes.isEmpty()) {
                     //Append the collected digits to symbols
@@ -159,9 +170,7 @@ public class Cell {
         }
         //System.out.println("After consolidation"+symbols);
         //Remove nulls and tildas
-        for (int i=0;i<symbols.size();i+=1) {
-            symbols.remove(null);
-        }
+        symbols.removeIf(Objects::isNull);
         symbols.remove("~");
         //System.out.println("Return" + symbols);
         return symbols;
@@ -171,7 +180,7 @@ public class Cell {
     }
     //The function does this "[2, *, 8, /, 875, *, 2]" -> "[367]" Without : ")","(".
     public static ArrayList<String> looper(ArrayList<String> text) {
-        System.out.println(text);
+        //System.out.println(text);
         while (text.contains("/")) {
             //In case text contains / we want to loop through it, calculate the first couple of numbers and calculating, then one more time in case text has /
             for (int i = 0; i < text.size(); i += 1) {
@@ -179,6 +188,7 @@ public class Cell {
                     String newvalue = "";
                     double number_before = Double.parseDouble(text.get(i - 1));
                     double number_after = Double.parseDouble(text.get(i + 1));
+                    if (number_after==0) {throw new ArithmeticException("You cand divide by 0");}
                     newvalue = Double.toString(number_before / number_after);
                     int first_index = i - 1;
                     text.set(first_index, newvalue);
@@ -259,7 +269,7 @@ public class Cell {
                 text.remove(null);
             }
         }
-        System.out.println(text);
+        //System.out.println(text);
         return text;
     }
 
