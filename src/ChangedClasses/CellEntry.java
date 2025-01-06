@@ -15,3 +15,5 @@ public class CellEntry implements Index2D {
     @Override
     public int getY() {return Ex2Utils.ERR;}
 }
+
+
