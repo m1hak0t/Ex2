@@ -1,5 +1,7 @@
 package UnchangedClasses;
 
+import ChangedClasses.Ex2Sheet;
+import Interfaces.Cell;
 import Interfaces.Index2D;
 import Interfaces.Sheet;
 

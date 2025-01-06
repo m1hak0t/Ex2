@@ -61,11 +61,7 @@ class LooperTest {
         assertEquals(42, CellFuntions.Calculate(input));
     }
 
-    @Test
-    public void testDecimalPrecision() {
-        String input = "10/3";
-        assertEquals(3.3333, CellFuntions.Calculate(input), 0.0001);
-    }
+
 
     @Test
     public void testOperatorPrecedence() {

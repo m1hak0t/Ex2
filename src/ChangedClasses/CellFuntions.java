@@ -63,7 +63,7 @@ public class CellFuntions {
         if (text != null && !text.isEmpty() && !text.contains(" ")) {
             //Check if there are parenthasies
             try {
-                ans = Calculate(text);
+                ans = Double.parseDouble(Calculate(text));
             } catch (ArithmeticException e) {
                 System.out.println("You cant divide by 0");
             }
@@ -72,13 +72,16 @@ public class CellFuntions {
     }
 
     //The function does this: "1*1/((875*2)+8-9*12)" -> 334 recursively untily gets rid of all the parenthasies
-    public static double Calculate(String text) {
+    public static String Calculate(String text) {
         if (text.equals("") || text==null) {
-            throw new IllegalArgumentException();
+            return "";
         }
+        //remove the = sign
         String log = text;
         double ans = 0;
         ArrayList divided = DividerbyAction(text);
+        //remove the = sign
+        if (divided.contains("=")) {divided.remove(0);}
         ArrayList<Integer> indexbox = new ArrayList<>();
         boolean torun = false;
         //In case there are parenthasies - find the last parenthasies and calculate the expression inside them
@@ -115,16 +118,16 @@ public class CellFuntions {
                     indexbox.clear();
                     torun = false;
                     //Pass further into the recursion loop
-                    double res = Calculate(text);
+                    double res = Double.parseDouble(Calculate(text));
                     System.out.println("The following string extracted --> " + log.substring(left_bound,right_bound+1) + " from " + divided );
-                    return res;
+                    return String.valueOf(res);
                 }
         }
         }
         //Return the result of a looper (array) turned into string and parse Double'ed after.
         ans = Double.parseDouble(looper(divided).get(0).toString());
 
-        return ans;
+        return String.valueOf(ans);
     }
     //The Function that does: "1*1/875*2+8-9*12" -> [1, *, 1, /, 875, *, 2, +, 8, -, 9, *, 12]
     private static ArrayList<String> DividerbyAction(String text) {

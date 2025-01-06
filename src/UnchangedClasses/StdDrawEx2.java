@@ -28,6 +28,8 @@ package UnchangedClasses;//package stdDraw;
  *
  ******************************************************************************/
 
+import Interfaces.Index2D;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;

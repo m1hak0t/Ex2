@@ -7,6 +7,15 @@ import UnchangedClasses.Ex2Utils;
 import java.io.IOException;
 // Add your documentation below:
 
+/// TODO:1
+/// Improve all the functions in the cell like you drew in a notebook
+/// TODO:2
+/// Each cell has to have a list of dependencies as an object property, it's calculatable once all the depenencies are calculatable.
+/// is something that is being check after the input
+/// TODO:3
+/// Write depth algorithm, just go through the sheet and check whether the cell is calculatable, if yes - calculate.
+/// Do this loop and make sure every iteration something changed, if there are uncalculated cells and nothing chenges - this is a circle loop
+
 public class Ex2Sheet implements Sheet {
     private Cell[][] table;
     // Add your code here
@@ -69,10 +78,15 @@ public class Ex2Sheet implements Sheet {
     }
     @Override
     public void eval() {
-        int[][] dd = depth();
-        // Add your code here
+        //int[][] dd = depth();
+        int [][] ans = new int[width()][height()];
+        for (int i=0; i<width(); i++) {
+            for (int j=0; j<height();j++) {
+                String data = table[i][j].getData();
+                table[i][j].setData(String.valueOf(CellFuntions.Calculate(data)));
+            }
+        }
 
-        // ///////////////////
     }
 
     @Override
@@ -87,9 +101,8 @@ public class Ex2Sheet implements Sheet {
     @Override
     public int[][] depth() {
         int[][] ans = new int[width()][height()];
-        // Add your code here
-
-        // ///////////////////
+        //Set all the values to -1
+        //Go through the created 2d array and check whether the cell in the ex2sheet itself is dependent
         return ans;
     }
 
