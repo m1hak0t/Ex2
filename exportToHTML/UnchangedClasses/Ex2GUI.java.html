@@ -1,0 +1,177 @@
+<html>
+<head>
+<title>Ex2GUI.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #5f826b; font-style: italic;}
+.s4 { color: #67a37c; font-style: italic;}
+.s5 { color: #7a7e85;}
+.s6 { color: #2aacb8;}
+.s7 { color: #6aab73;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Ex2GUI.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">UnchangedClasses</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">ChangedClasses</span><span class="s2">.</span><span class="s1">Ex2Sheet</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">Interfaces</span><span class="s2">.</span><span class="s1">Cell</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">Interfaces</span><span class="s2">.</span><span class="s1">Index2D</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">Interfaces</span><span class="s2">.</span><span class="s1">Sheet</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">awt</span><span class="s2">.*;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">io</span><span class="s2">.</span><span class="s1">IOException</span><span class="s2">;</span>
+
+<span class="s3">/**</span>
+ <span class="s3">* ArielU. Intro2CS, Ex2: https://docs.google.com/document/d/1-18T-dj00apE4k1qmpXGOaqttxLn-Kwi/edit?usp=sharing&amp;ouid=113711744349547563645&amp;rtpof=true&amp;sd=true</span>
+ <span class="s3">* DO NOT CHANGE THIS INTERFACE!!</span>
+ <span class="s3">* This is NOT a Junit class - as it tests GUI components which</span>
+ <span class="s3">* should not be tested using Junit.</span>
+ <span class="s3">* </span>
+ <span class="s3">* The Code uses the STDDraw class:</span>
+ <span class="s3">* https://introcs.cs.princeton.edu/java/stdlib/javadoc/StdDraw.html</span>
+ <span class="s3">* Note: a few minor changes were added to STDDraw suit the logic of Ex2:</span>
+ <span class="s3">* </span><span class="s4">@author </span><span class="s3">boaz.benmoshe</span>
+ <span class="s3">*</span>
+ <span class="s3">*/</span>
+<span class="s0">public class </span><span class="s1">Ex2GUI </span><span class="s2">{</span>
+
+	<span class="s0">private static </span><span class="s1">Sheet table</span><span class="s2">; </span><span class="s5">// this is the main data (an implementation of the Sheet interface).</span>
+	<span class="s0">private static </span><span class="s1">Index2D cord </span><span class="s2">= </span><span class="s0">null</span><span class="s2">; </span><span class="s5">// a table entry used by the GUI of setting up a cell value / form</span>
+	<span class="s0">public </span><span class="s1">Ex2GUI</span><span class="s2">() {;}  </span><span class="s5">// an empty (redundant) constructor.</span>
+
+	<span class="s3">/** The main function for running Ex2 */</span>
+	<span class="s0">public static void </span><span class="s1">main</span><span class="s2">(</span><span class="s1">String</span><span class="s2">[] </span><span class="s1">a</span><span class="s2">) {</span>
+		<span class="s1">table </span><span class="s2">= </span><span class="s0">new </span><span class="s1">Ex2Sheet</span><span class="s2">(</span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">WIDTH</span><span class="s2">, </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">HEIGHT</span><span class="s2">);</span>
+		<span class="s1">testSimpleGUI</span><span class="s2">(</span><span class="s1">table</span><span class="s2">);</span>
+	<span class="s2">}</span>
+
+	<span class="s3">/**</span>
+	 <span class="s3">* This function runs the main (endlees) loop of the GUI</span>
+	 <span class="s3">* </span><span class="s4">@param </span><span class="s3">table the SpreadSheet - note: this class is written as a naive implementation of &quot;singleton&quot; (i.e., all static).</span>
+	 <span class="s3">*/</span>
+	<span class="s0">public static void </span><span class="s1">testSimpleGUI</span><span class="s2">(</span><span class="s1">Sheet table</span><span class="s2">) {</span>
+		<span class="s5">// init parameters</span>
+		<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">setCanvasSize</span><span class="s2">(</span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">WINDOW_WIDTH</span><span class="s2">, </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">WINDOW_HEIGHT</span><span class="s2">);</span>
+		<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">setScale</span><span class="s2">(</span><span class="s6">0</span><span class="s2">, </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">MAX_X</span><span class="s2">);</span>
+		<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">setPenRadius</span><span class="s2">(</span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">PEN_RADIUS</span><span class="s2">);</span>
+		<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">enableDoubleBuffering</span><span class="s2">();</span>
+		<span class="s1">table</span><span class="s2">.</span><span class="s1">eval</span><span class="s2">();</span>
+		<span class="s5">// endless loop (GUI)</span>
+		<span class="s0">while </span><span class="s2">(</span><span class="s0">true</span><span class="s2">) {</span>
+			<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">clear</span><span class="s2">(); </span><span class="s5">// clear the GUI (Ex2 window).</span>
+			<span class="s1">drawFrame</span><span class="s2">(); </span><span class="s5">// draws the lines.</span>
+			<span class="s1">drawCells</span><span class="s2">(); </span><span class="s5">// draws the cells</span>
+			<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">show</span><span class="s2">(); </span><span class="s5">// presents the window.</span>
+			<span class="s0">int </span><span class="s1">xx </span><span class="s2">= </span><span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">getXX</span><span class="s2">(); </span><span class="s5">// gets the x coordinate of the mouse click (-1 if none)</span>
+			<span class="s0">int </span><span class="s1">yy </span><span class="s2">= </span><span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">getYY</span><span class="s2">(); </span><span class="s5">// gets the y coordinate of the mouse click (-1 if none)</span>
+			<span class="s1">inputCell</span><span class="s2">(</span><span class="s1">xx</span><span class="s2">,</span><span class="s1">yy</span><span class="s2">); 			 </span><span class="s5">// if isIn(xx,yy) an input window will be opened to allow the user to edit cell (xx,yy);</span>
+			<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">pause</span><span class="s2">(</span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">WAIT_TIME_MS</span><span class="s2">); </span><span class="s5">// waits a few milliseconds - say 30 fps is sufficient.</span>
+		<span class="s2">}</span>
+	<span class="s2">}</span>
+	<span class="s0">public static void </span><span class="s1">save</span><span class="s2">(</span><span class="s1">String fileName</span><span class="s2">){</span>
+		<span class="s0">try </span><span class="s2">{</span>
+			<span class="s1">table</span><span class="s2">.</span><span class="s1">save</span><span class="s2">(</span><span class="s1">fileName</span><span class="s2">);</span>
+		<span class="s2">}</span>
+		<span class="s0">catch </span><span class="s2">(</span><span class="s1">IOException e</span><span class="s2">) {</span>
+			<span class="s1">e</span><span class="s2">.</span><span class="s1">printStackTrace</span><span class="s2">();</span>
+		<span class="s2">}</span>
+	<span class="s2">}</span>
+	<span class="s0">public static void </span><span class="s1">load</span><span class="s2">(</span><span class="s1">String fileName</span><span class="s2">){</span>
+		<span class="s0">try </span><span class="s2">{</span>
+			<span class="s1">table</span><span class="s2">.</span><span class="s1">load</span><span class="s2">(</span><span class="s1">fileName</span><span class="s2">);</span>
+		<span class="s2">}</span>
+		<span class="s0">catch </span><span class="s2">(</span><span class="s1">IOException e</span><span class="s2">) {</span>
+			<span class="s1">e</span><span class="s2">.</span><span class="s1">printStackTrace</span><span class="s2">();</span>
+		<span class="s2">}</span>
+	<span class="s2">}</span>
+	<span class="s0">private static </span><span class="s1">Color getColorFromType</span><span class="s2">(</span><span class="s0">int </span><span class="s1">t</span><span class="s2">) {</span>
+		<span class="s1">Color ans </span><span class="s2">= </span><span class="s1">Color</span><span class="s2">.</span><span class="s1">GRAY</span><span class="s2">;</span>
+		<span class="s0">if</span><span class="s2">(</span><span class="s1">t</span><span class="s2">== </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">NUMBER</span><span class="s2">) {</span><span class="s1">ans</span><span class="s2">=</span><span class="s1">Color</span><span class="s2">.</span><span class="s1">BLACK</span><span class="s2">;}</span>
+		<span class="s0">if</span><span class="s2">(</span><span class="s1">t</span><span class="s2">== </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">FORM</span><span class="s2">) {</span><span class="s1">ans</span><span class="s2">=</span><span class="s1">Color</span><span class="s2">.</span><span class="s1">BLUE</span><span class="s2">;}</span>
+		<span class="s0">if</span><span class="s2">(</span><span class="s1">t</span><span class="s2">== </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">ERR_FORM_FORMAT</span><span class="s2">) {</span><span class="s1">ans</span><span class="s2">=</span><span class="s1">Color</span><span class="s2">.</span><span class="s1">RED</span><span class="s2">;}</span>
+		<span class="s0">if</span><span class="s2">(</span><span class="s1">t</span><span class="s2">== </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">ERR_CYCLE_FORM</span><span class="s2">) {</span><span class="s1">ans</span><span class="s2">= </span><span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">BOOK_RED</span><span class="s2">;}</span>
+		<span class="s0">return </span><span class="s1">ans</span><span class="s2">;</span>
+	<span class="s2">}</span>
+
+	<span class="s3">/**</span>
+	 <span class="s3">* Draws the lines of the spreadsheet.</span>
+	 <span class="s3">*/</span>
+	<span class="s0">private static void </span><span class="s1">drawFrame</span><span class="s2">() {</span>
+		<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">setPenColor</span><span class="s2">(</span><span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">BLACK</span><span class="s2">);</span>
+		<span class="s0">int </span><span class="s1">max_y </span><span class="s2">= </span><span class="s1">table</span><span class="s2">.</span><span class="s1">height</span><span class="s2">();</span>
+		<span class="s0">double </span><span class="s1">x_space </span><span class="s2">= </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">GUI_X_SPACE</span><span class="s2">, </span><span class="s1">x_start </span><span class="s2">= </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">GUI_X_START</span><span class="s2">;</span>
+		<span class="s0">double </span><span class="s1">y_height </span><span class="s2">= </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">GUI_Y_TEXT_START</span><span class="s2">;</span>
+		<span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">y </span><span class="s2">= </span><span class="s6">0</span><span class="s2">; </span><span class="s1">y </span><span class="s2">&lt; </span><span class="s1">max_y</span><span class="s2">; </span><span class="s1">y </span><span class="s2">= </span><span class="s1">y </span><span class="s2">+ </span><span class="s6">1</span><span class="s2">) {</span>
+			<span class="s0">double </span><span class="s1">xs </span><span class="s2">= </span><span class="s1">y </span><span class="s2">* </span><span class="s1">x_space</span><span class="s2">;</span>
+			<span class="s0">double </span><span class="s1">xc </span><span class="s2">= </span><span class="s1">x_start </span><span class="s2">+ </span><span class="s1">y </span><span class="s2">* </span><span class="s1">x_space</span><span class="s2">;</span>
+			<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">line</span><span class="s2">(</span><span class="s6">0</span><span class="s2">, </span><span class="s1">y </span><span class="s2">+ </span><span class="s6">1</span><span class="s2">, </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">MAX_X</span><span class="s2">, </span><span class="s1">y </span><span class="s2">+ </span><span class="s6">1</span><span class="s2">);</span>
+			<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">line</span><span class="s2">(</span><span class="s1">xs</span><span class="s2">, </span><span class="s6">0</span><span class="s2">, </span><span class="s1">xs</span><span class="s2">, </span><span class="s1">max_y</span><span class="s2">);</span>
+			<span class="s0">int </span><span class="s1">yy </span><span class="s2">= </span><span class="s1">max_y </span><span class="s2">- (</span><span class="s1">y </span><span class="s2">+ </span><span class="s6">1</span><span class="s2">);</span>
+			<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">text</span><span class="s2">(</span><span class="s6">1</span><span class="s2">, </span><span class="s1">y </span><span class="s2">+ </span><span class="s1">y_height</span><span class="s2">, </span><span class="s7">&quot;&quot; </span><span class="s2">+ (</span><span class="s1">yy</span><span class="s2">));</span>
+			<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">text</span><span class="s2">(</span><span class="s1">xc</span><span class="s2">, </span><span class="s1">max_y </span><span class="s2">+ </span><span class="s1">y_height</span><span class="s2">, </span><span class="s7">&quot;&quot; </span><span class="s2">+ </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">ABC</span><span class="s2">[</span><span class="s1">y</span><span class="s2">]);</span>
+		<span class="s2">}</span>
+	<span class="s2">}</span>
+	<span class="s3">/**</span>
+	 <span class="s3">* Draws the content of each cell (none empty).</span>
+	 <span class="s3">*/</span>
+	<span class="s0">private static void </span><span class="s1">drawCells</span><span class="s2">() {</span>
+		<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">setPenColor</span><span class="s2">(</span><span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">BLACK</span><span class="s2">);</span>
+		<span class="s0">int </span><span class="s1">max_y </span><span class="s2">= </span><span class="s1">table</span><span class="s2">.</span><span class="s1">height</span><span class="s2">();</span>
+		<span class="s0">int </span><span class="s1">maxx </span><span class="s2">= </span><span class="s1">table</span><span class="s2">.</span><span class="s1">width</span><span class="s2">();</span>
+		<span class="s0">double </span><span class="s1">x_space </span><span class="s2">= </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">GUI_X_SPACE</span><span class="s2">, </span><span class="s1">x_start </span><span class="s2">= </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">GUI_X_START</span><span class="s2">;</span>
+		<span class="s0">double </span><span class="s1">y_height </span><span class="s2">= </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">GUI_Y_TEXT_START</span><span class="s2">;</span>
+		<span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">x </span><span class="s2">= </span><span class="s6">0</span><span class="s2">; </span><span class="s1">x </span><span class="s2">&lt; </span><span class="s1">maxx</span><span class="s2">; </span><span class="s1">x </span><span class="s2">= </span><span class="s1">x </span><span class="s2">+ </span><span class="s6">1</span><span class="s2">) {</span>
+			<span class="s0">double </span><span class="s1">xc </span><span class="s2">= </span><span class="s1">x_start </span><span class="s2">+ </span><span class="s1">x </span><span class="s2">* </span><span class="s1">x_space</span><span class="s2">;</span>
+			<span class="s0">for </span><span class="s2">(</span><span class="s0">int </span><span class="s1">y </span><span class="s2">= </span><span class="s6">0</span><span class="s2">; </span><span class="s1">y </span><span class="s2">&lt; </span><span class="s1">max_y</span><span class="s2">; </span><span class="s1">y </span><span class="s2">= </span><span class="s1">y </span><span class="s2">+ </span><span class="s6">1</span><span class="s2">) {</span>
+				<span class="s1">String w </span><span class="s2">= </span><span class="s1">table</span><span class="s2">.</span><span class="s1">value</span><span class="s2">(</span><span class="s1">x</span><span class="s2">, </span><span class="s1">y</span><span class="s2">);</span><span class="s5">//&quot;&quot;+abc[x]+y;</span>
+				<span class="s1">Cell cc </span><span class="s2">= </span><span class="s1">table</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">x</span><span class="s2">, </span><span class="s1">y</span><span class="s2">);</span>
+				<span class="s0">int </span><span class="s1">t </span><span class="s2">= </span><span class="s1">cc</span><span class="s2">.</span><span class="s1">getType</span><span class="s2">();</span>
+				<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">setPenColor</span><span class="s2">(</span><span class="s1">getColorFromType</span><span class="s2">(</span><span class="s1">t</span><span class="s2">));</span>
+				<span class="s0">int </span><span class="s1">max </span><span class="s2">= </span><span class="s1">Math</span><span class="s2">.</span><span class="s1">min</span><span class="s2">(</span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">MAX_CHARS</span><span class="s2">, </span><span class="s1">w</span><span class="s2">.</span><span class="s1">length</span><span class="s2">());</span>
+				<span class="s1">w </span><span class="s2">= </span><span class="s1">w</span><span class="s2">.</span><span class="s1">substring</span><span class="s2">(</span><span class="s6">0</span><span class="s2">, </span><span class="s1">max</span><span class="s2">);</span>
+				<span class="s0">double </span><span class="s1">yc </span><span class="s2">= </span><span class="s1">max_y </span><span class="s2">- (</span><span class="s1">y </span><span class="s2">+ </span><span class="s6">1 </span><span class="s2">- </span><span class="s1">y_height</span><span class="s2">);</span>
+				<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">text</span><span class="s2">(</span><span class="s1">xc</span><span class="s2">, </span><span class="s1">yc</span><span class="s2">, </span><span class="s1">w</span><span class="s2">);</span>
+			<span class="s2">}</span>
+		<span class="s2">}</span>
+	<span class="s2">}</span>
+
+	<span class="s3">/** input a content into cell(xx,yy) if it is within this SpreadSheet.</span>
+	 <span class="s3">*</span>
+	 <span class="s3">* </span><span class="s4">@param </span><span class="s3">xx the x coordinate of the required cell.</span>
+	 <span class="s3">* </span><span class="s4">@param </span><span class="s3">yy the y coordinate of the required cell.</span>
+	 <span class="s3">*/</span>
+	<span class="s0">private static void </span><span class="s1">inputCell</span><span class="s2">(</span><span class="s0">int </span><span class="s1">xx</span><span class="s2">,</span><span class="s0">int </span><span class="s1">yy</span><span class="s2">) {</span>
+		<span class="s0">if</span><span class="s2">(</span><span class="s1">table</span><span class="s2">.</span><span class="s1">isIn</span><span class="s2">(</span><span class="s1">xx</span><span class="s2">,</span><span class="s1">yy</span><span class="s2">)) {</span>
+			<span class="s1">Cell cc </span><span class="s2">= </span><span class="s1">table</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">xx</span><span class="s2">,</span><span class="s1">yy</span><span class="s2">);</span>
+			<span class="s1">String ww </span><span class="s2">= </span><span class="s1">cord</span><span class="s2">+</span><span class="s7">&quot;: &quot;</span><span class="s2">+</span><span class="s1">cc</span><span class="s2">.</span><span class="s1">toString</span><span class="s2">()+</span><span class="s7">&quot; : &quot;</span><span class="s2">;</span>
+			<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">text</span><span class="s2">(</span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">GUI_X_START</span><span class="s2">, </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">MAX_X</span><span class="s2">-</span><span class="s6">1</span><span class="s2">, </span><span class="s1">ww</span><span class="s2">);</span>
+			<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">show</span><span class="s2">();</span>
+			<span class="s0">if</span><span class="s2">(</span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">Debug</span><span class="s2">) {</span><span class="s1">System</span><span class="s2">.</span><span class="s1">out</span><span class="s2">.</span><span class="s1">println</span><span class="s2">(</span><span class="s1">ww</span><span class="s2">);}</span>
+			<span class="s1">String c </span><span class="s2">= </span><span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">getCell</span><span class="s2">(</span><span class="s1">cord</span><span class="s2">,</span><span class="s1">cc</span><span class="s2">.</span><span class="s1">getData</span><span class="s2">());</span>
+			<span class="s1">String s1 </span><span class="s2">= </span><span class="s1">table</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">xx</span><span class="s2">,</span><span class="s1">yy</span><span class="s2">).</span><span class="s1">getData</span><span class="s2">();</span>
+			<span class="s0">if</span><span class="s2">(</span><span class="s1">c</span><span class="s2">==</span><span class="s0">null</span><span class="s2">) {</span>
+				<span class="s1">table</span><span class="s2">.</span><span class="s1">set</span><span class="s2">(</span><span class="s1">xx</span><span class="s2">,</span><span class="s1">yy</span><span class="s2">,</span><span class="s1">s1</span><span class="s2">);</span>
+			<span class="s2">}</span>
+			<span class="s0">else </span><span class="s2">{</span>
+				<span class="s1">table</span><span class="s2">.</span><span class="s1">set</span><span class="s2">(</span><span class="s1">xx</span><span class="s2">, </span><span class="s1">yy</span><span class="s2">, </span><span class="s1">c</span><span class="s2">);</span>
+				<span class="s0">int</span><span class="s2">[][] </span><span class="s1">calc_d </span><span class="s2">= </span><span class="s1">table</span><span class="s2">.</span><span class="s1">depth</span><span class="s2">();</span>
+				<span class="s0">if </span><span class="s2">(</span><span class="s1">calc_d</span><span class="s2">[</span><span class="s1">xx</span><span class="s2">][</span><span class="s1">yy</span><span class="s2">] == </span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">ERR</span><span class="s2">) {</span>
+					<span class="s1">table</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">xx</span><span class="s2">,</span><span class="s1">yy</span><span class="s2">).</span><span class="s1">setType</span><span class="s2">(</span><span class="s1">Ex2Utils</span><span class="s2">.</span><span class="s1">ERR_CYCLE_FORM</span><span class="s2">);</span>
+				<span class="s2">}</span>
+			<span class="s2">}</span>
+			<span class="s1">table</span><span class="s2">.</span><span class="s1">eval</span><span class="s2">();</span>
+			<span class="s1">StdDrawEx2</span><span class="s2">.</span><span class="s1">resetXY</span><span class="s2">();</span>
+		<span class="s2">}</span>
+	<span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>

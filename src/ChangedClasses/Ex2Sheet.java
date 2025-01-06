@@ -5,14 +5,26 @@ import Interfaces.Sheet;
 import UnchangedClasses.Ex2Utils;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 // Add your documentation below:
 
 /// TODO:1
-/// Improve all the functions in the cell like you drew in a notebook
-/// TODO:2
-/// Each cell has to have a list of dependencies as an object property, it's calculatable once all the depenencies are calculatable.
-/// is something that is being check after the input
-/// TODO:3
+/// To finish the Scell class
+/// TODO:2 - The main idea of the system
+///
+/// <--->
+/// The function depth created a 2d array of cells so its size is WIDTHxLENGTH and gives every cell a specific value of -1
+/// The function eval() starts to loop through the depth 2d array and do the following:
+/// If the cell does not depend on eny other cell - calculate it, if it depends on other cells -> check whether all of them calculatable
+/// right now (depChecker()) and if yes -> calculate all of them and if not - wait to the next iteration. After every iteration we increase
+/// the value of every uncalculated cell by 1 and check whether any changes are made during the calculation. If the depths of some set of sells
+/// grows but nothing changed after the iteration -> these 2 cells have an infinite loop.
+/// </--->
+///
+/// TODO:3 - Write a depChecker
+///
+/// TODO:4
 /// Write depth algorithm, just go through the sheet and check whether the cell is calculatable, if yes - calculate.
 /// Do this loop and make sure every iteration something changed, if there are uncalculated cells and nothing chenges - this is a circle loop
 
@@ -128,5 +140,28 @@ public class Ex2Sheet implements Sheet {
 
         /////////////////////
         return ans;
+    }
+
+
+    ///Takes an expression as a string and checks whether it's dependencies are instantly calculatable
+    ///If no - returns null
+    ///If yes - returns a string with the expression already calculated inside
+    private static String depChecker (String expression) {
+        int count = 0;
+        //RegEx to find coordinates like A5
+        Pattern pattern = Pattern.compile("[A-Z]+[0-9]+");
+        Matcher matcher = pattern.matcher(expression);
+        //Now we will update all the expressions we have found and also count them!
+        StringBuilder newexpression = new StringBuilder();
+
+        //While loop until there is no mathches left
+        while (matcher.find()) {
+            String coords = matcher.group();
+            //Calculate the expression in the desired cell
+
+            CellEntry cell = new CellEntry(coords);
+
         }
+        return expression;
+    }
 }
