@@ -30,9 +30,6 @@ import java.util.regex.Pattern;
 
 public class Ex2Sheet implements Sheet {
     public Cell[][] table;
-    // Add your code here
-
-    // ///////////////////
     public Ex2Sheet(int x, int y) {
         table = new SCell[x][y];
         for(int i=0;i<x;i=i+1) {
@@ -88,30 +85,61 @@ public class Ex2Sheet implements Sheet {
 
         /////////////////////
     }
+
+
+    /// The most interesting one
+    /// Initiate the depth array with -1's
+    /// If there are no -1
     @Override
     public void eval() {
+        //Start the algo
+        //Initiate the basic depth sheet
         //int[][] dd = depth();
         int [][] ans = new int[width()][height()];
-        for (int i=0; i<width(); i++) {
-            for (int j=0; j<height();j++) {
-                String data = table[i][j].getData();
-                table[i][j].setData(String.valueOf(CellFuntions.Calculate(data)));
+        //ifchanged = false
+        //while
+        //ifchanged = false
+        //depth = 0
+        //while i < lenxheight
+        //cell.setdata = eval(cell.getdata(i))
+        //If evalstring returns Error or String -> update current cell depth to current depth
+        //ifchanged = true
+        //If evalstring returns null - continue the iteration
+        //depth += 1
+        //Continue while loop until
+        for (int x=0; x< width()*height();x++) {
+            //Iterations through the sheet
+            for (int i = 0; i< width();i++) {
+                for (int j = 0; j< width();j++) {
+                    System.out.println("Iteration through" + i + ", " + j);
+                    if (!table[i][j].getData().isEmpty()) {
+                        String data = eval(i, j);
+                        if (data == null) {
+                            /// /
+                        } else {
+                            System.out.println("Data inserted into" + "-> " + i + ", " + j);
+                            table[i][j].setData(data);
+                        }
+                    }
+                }
             }
         }
-
     }
 
     @Override
     public boolean isIn(int xx, int yy) {
-        boolean ans = xx<=width() && yy<=height();
-        return ans;
+        return xx >= 0 && xx < width() && yy >= 0 && yy < height();
     }
 
+    //Created a 2d array of depth of each cell, after that we will change this array in the eval function
     @Override
     public int[][] depth() {
         int[][] ans = new int[width()][height()];
-        //Set all the values to -1
-        //Go through the created 2d array and check whether the cell in the ex2sheet itself is dependent
+        for (int i=0; i<width(); i++) {
+            for (int j=0; j<height(); j++) {
+                ans[i][j] = -1;
+            }
+        }
         return ans;
     }
 
@@ -168,6 +196,7 @@ public class Ex2Sheet implements Sheet {
             //Initialise new expression to change
             StringBuilder newexpression = new StringBuilder(expression);
             String coords = matcher.group();
+            System.out.println("Dependency found -->" + coords);
             //Calculate the expression in the desired cell
             CellEntry cell = new CellEntry(coords);
             //Get the coordinates of the current cell
@@ -177,6 +206,7 @@ public class Ex2Sheet implements Sheet {
                 throw new IllegalArgumentException("Cell " + cell.toString() + "is out of range");
             }
             //Get the string that is located there
+            //rekcirbleahcim
             Cell currentcell = this.table[x][y];
             System.out.println(currentcell.getType());
             System.out.println(currentcell.getData());

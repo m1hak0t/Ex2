@@ -6,10 +6,6 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class CellFuntions {
-
-    // Patterns to match each type
-    private static final Pattern NUMBER_PATTERN = Pattern.compile("-?\\d+(\\.\\d+)?"); // Matches pure numbers
-
     // Checks if the input is a pure number
     public static boolean IsNumber(String str) {
         if (str == null || str.trim().isEmpty()) {
@@ -30,10 +26,10 @@ public class CellFuntions {
             return false;
         }
 
-        // Regular expression to match formulas
+        // Regular expression (!!!!!!!!!!!!!!!!!!!) to match formulas
         String formulaRegex = "^=\\s*([A-Za-z]+\\d+|\\d+|\\(([^()]|\\([^()]*\\))*\\))(\\s*[-+*/]\\s*([A-Za-z]+\\d+|\\d+|\\(([^()]|\\([^()]*\\))*\\)))*$";
 
-        // Trim the string and test it against the regex pattern
+        // Trim the string with the regex pattern
         return Pattern.matches(formulaRegex, input.trim());
     }
 
