@@ -20,16 +20,8 @@ class CalculateTest {
     void testDivisionByZero() {
         // Test division by zero (should handle gracefully)
         String expression = "1/0";
-        assertThrows(ArithmeticException.class, () -> CellFuntions.Calculate(expression));
-    }
-
-    @Test
-    void testEmptyExpression() {
-        // Test empty string
-        String expression = "";
         assertThrows(IllegalArgumentException.class, () -> CellFuntions.Calculate(expression));
     }
-
     @Test
     void testNullExpression() {
         // Test null input

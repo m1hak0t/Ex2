@@ -30,7 +30,7 @@ public class CellEntryTest {
     public void testConstructorWithString() {
         // Verify that the object is correctly initialized with a string cell name
         assertEquals("C3", cellEntryString.toString());
-        assertEquals(3, cellEntryString.getX());
+        assertEquals(2, cellEntryString.getX());
         assertEquals(3, cellEntryString.getY());
     }
 
@@ -45,7 +45,7 @@ public class CellEntryTest {
     public void testToCords() {
         // Test if the toCords method correctly converts the string index into coordinates
         ArrayList<Integer> coords = cellEntryString.toCords();
-        assertEquals(3, coords.get(0)); // x = 'C' -> 3
+        assertEquals(2, coords.get(0)); // x = 'C' -> 3
         assertEquals(3, coords.get(1)); // y = 3
     }
 

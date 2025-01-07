@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 /// Do this loop and make sure every iteration something changed, if there are uncalculated cells and nothing chenges - this is a circle loop
 
 public class Ex2Sheet implements Sheet {
-    private Cell[][] table;
+    public Cell[][] table;
     // Add your code here
 
     // ///////////////////
@@ -103,10 +103,7 @@ public class Ex2Sheet implements Sheet {
 
     @Override
     public boolean isIn(int xx, int yy) {
-        boolean ans = xx>=0 && yy>=0;
-        // Add your code here
-
-        /////////////////////
+        boolean ans = xx<=width() && yy<=height();
         return ans;
     }
 
@@ -132,36 +129,86 @@ public class Ex2Sheet implements Sheet {
         /////////////////////
     }
 
+
+    /// The function that we will use in a future to define what will happen in one particular cell
     @Override
     public String eval(int x, int y) {
-        String ans = null;
-        if(get(x,y)!=null) {ans = get(x,y).toString();}
-        // Add your code here
+        String data = null;
+        if(get(x,y)!=null)
+        {data = get(x,y).toString();}
+        //What should be done
+        //depCheck the string
+        //If there is an exception -> return ERR.Form
+        //If there is no exception -> return Calculated form
+        try {
+            data = depChecker(data);
+            return data;
 
-        /////////////////////
-        return ans;
+        } catch (IllegalArgumentException e) {
+            //In case something gave an invalid argument exception - return an error
+            return Ex2Utils.ERR_FORM;
+        }
     }
 
 
     ///Takes an expression as a string and checks whether it's dependencies are instantly calculatable
-    ///If no - returns null
-    ///If yes - returns a string with the expression already calculated inside
-    private static String depChecker (String expression) {
+    ///If no - returns Null
+    ///If yes - returns a string with the expression already calculated inside (recursive call)
+    /// If the dependencies are uncalculatable types (Strings, Errors) throws an argument exception
+    public String depChecker(String expression) {
+
         int count = 0;
         //RegEx to find coordinates like A5
         Pattern pattern = Pattern.compile("[A-Z]+[0-9]+");
         Matcher matcher = pattern.matcher(expression);
         //Now we will update all the expressions we have found and also count them!
-        StringBuilder newexpression = new StringBuilder();
 
-        //While loop until there is no mathches left
-        while (matcher.find()) {
+        //While loop until there is no matches left
+        if (matcher.find()) {
+            //Initialise new expression to change
+            StringBuilder newexpression = new StringBuilder(expression);
             String coords = matcher.group();
             //Calculate the expression in the desired cell
-
             CellEntry cell = new CellEntry(coords);
-
+            //Get the coordinates of the current cell
+            int x = cell.getX();
+            int y = cell.getY();
+            if (!isIn(x,y)) {
+                throw new IllegalArgumentException("Cell " + cell.toString() + "is out of range");
+            }
+            //Get the string that is located there
+            Cell currentcell = this.table[x][y];
+            System.out.println(currentcell.getType());
+            System.out.println(currentcell.getData());
+            //If there is an error inside = throw an exception of illigal argument
+            if (currentcell.getData().equals(Ex2Utils.ERR_FORM) || currentcell.getData().equals(Ex2Utils.ERR_CYCLE)) {
+                throw new IllegalArgumentException("One of the dependencies is an error");
+            }
+            //Only if the datatype is calculatable we want to calculate the cell
+            if (currentcell.getType() == 2 || currentcell.getType() == 3) {
+                //First and last index of the found data:
+                int first = matcher.start();
+                int last = matcher.end();
+                //Caclulated form can give an error in case we are dividing by 0 - catch that
+                String calculated = null;
+                try {
+                    //Get the datastring from the dependant cell
+                    String current_expression = currentcell.getData();
+                    String calculated_expression = String.valueOf(CellFuntions.ComputeForm(current_expression));
+                    calculated = calculated_expression;
+                } catch (Exception e) {
+                    //Set en errormessage in the uncalculatable cell in case its uncalculatable instantly
+                    return null;
+                }
+                newexpression.replace(first, last, calculated);
+                //Set the expression string== to newexpression that we've changes
+                expression = newexpression.toString();
+                //Recursive call of the function with the new data
+                return depChecker(expression);
+            } else {
+                throw new IllegalArgumentException("The dependant cell" + cell.toString()+ " is uncalculatable");
+            }
         }
-        return expression;
+        return CellFuntions.Calculate(expression);
     }
 }

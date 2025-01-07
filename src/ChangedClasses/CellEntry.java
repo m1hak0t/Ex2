@@ -17,7 +17,7 @@ public class CellEntry implements Index2D {
     public CellEntry(int x, int y) {
         //Grid init in case params xy
         for (int i=0; i< Ex2Utils.WIDTH;i ++) {
-            for (int j = 1; j < Ex2Utils.HEIGHT; j++) {
+            for (int j = 0; j < Ex2Utils.HEIGHT; j++) {
                 char letter = (char) (i + 65);
                 this.grid[i][j] = String.valueOf((letter)) + j;
             }
@@ -33,7 +33,7 @@ public class CellEntry implements Index2D {
         this.stringindex = cellName;
         if (isValid()) {
             for (int i = 0; i < Ex2Utils.WIDTH; i++) {
-                for (int j = 1; j < Ex2Utils.HEIGHT; j++) {
+                for (int j = 0; j < Ex2Utils.HEIGHT; j++) {
                     char letter = (char) (i + 65);
                     this.grid[i][j] = String.valueOf((letter)) + j;
                 }
@@ -57,7 +57,7 @@ public class CellEntry implements Index2D {
             return stringindex;
         }
         for (int x=0; x< Ex2Utils.WIDTH;x ++) {
-            for (int y=1;y<Ex2Utils.HEIGHT; y++) {
+            for (int y=0;y<Ex2Utils.HEIGHT; y++) {
                 char letter = (char)(x+65);
                 this.grid[x][y] = String.valueOf((letter))+y;
             }
@@ -68,7 +68,7 @@ public class CellEntry implements Index2D {
 
     public ArrayList<Integer> toCords() {
             ArrayList<Integer> result = new ArrayList<>();
-            int x = (int)stringindex.charAt(0) - 64;
+            int x = (int)stringindex.charAt(0) - 65;
             int y = Integer.parseInt(stringindex.substring(1));
             result.add(x);
             result.add(y);

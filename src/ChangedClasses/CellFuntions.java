@@ -3,57 +3,46 @@ package ChangedClasses;//TIP To <b>Run</b> code, press <shortcut actionId="Run"/
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class CellFuntions {
-    public static void main(String args []) {
-        System.out.println(Calculate("()"));
-    }
-    public static boolean isNumber(String text) {
-        boolean ans = true;
-        if (text == null || text.isEmpty()) {
-            ans = false;
-            return ans;
+
+    // Patterns to match each type
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("-?\\d+(\\.\\d+)?"); // Matches pure numbers
+
+    // Checks if the input is a pure number
+    public static boolean IsNumber(String str) {
+        if (str == null || str.trim().isEmpty()) {
+            return false;
         }
         try {
-            Double.parseDouble(text);
-            return ans;
+            Double.parseDouble(str.trim());
+            return true;
         } catch (NumberFormatException e) {
-            ans = false;
+            return false;
         }
-        return ans;
     }
 
-    public static boolean IsText(String text) {
+    // Checks if the input is a formula
+    public static boolean IsForm(String input) {
+        // Return false if input is null or empty
+        if (input == null || input.isBlank()) {
+            return false;
+        }
 
-        boolean ans = true;
-        if (text == null || text.isEmpty()) {
-            ans = false;
-            return ans;
-        }
-        if (true) {
-            String digits = "0123456789.";
-            for (int i = 0; i < text.length(); i++) {
-                if (!digits.contains(Character.toString(text.charAt(i)))) {
-                    ans = false;
-                    return ans;
-                }
-            }
-        }
-        return ans;
+        // Regular expression to match formulas
+        String formulaRegex = "^=\\s*([A-Za-z]+\\d+|\\d+|\\(([^()]|\\([^()]*\\))*\\))(\\s*[-+*/]\\s*([A-Za-z]+\\d+|\\d+|\\(([^()]|\\([^()]*\\))*\\)))*$";
+
+        // Trim the string and test it against the regex pattern
+        return Pattern.matches(formulaRegex, input.trim());
     }
 
-    public static boolean IsForm(String text) {
-        boolean ans = true;
-        if (text == null || text.isEmpty()) {
-            ans = false;
-            return ans;
-        }
-        if (text.substring(0, 1).equals("=")) {
-            return ans;
-        } else {
-            ans = false;
-        }
-        return ans;
+    // Checks if the input is text (not a number or formula)
+    public static boolean IsText(String s) {
+        if (s == null || s.isBlank()) return false;
+        s = s.trim();
+        // It's text if it's not a number and not a formula
+        return !IsNumber(s) && !IsForm(s);
     }
 
     public static double ComputeForm(String text) throws Exception {
@@ -76,58 +65,63 @@ public class CellFuntions {
         if (text.equals("") || text==null) {
             return "";
         }
-        //remove the = sign
-        String log = text;
-        double ans = 0;
-        ArrayList divided = DividerbyAction(text);
-        //remove the = sign
-        if (divided.contains("=")) {divided.remove(0);}
-        ArrayList<Integer> indexbox = new ArrayList<>();
-        boolean torun = false;
-        //In case there are parenthasies - find the last parenthasies and calculate the expression inside them
-        for (int i = 0; i<divided.size(); i+=1) {
-            //In case while looping through the expression ( is found
-            if ((divided.get(i)).equals("(")) {torun = true;}
-            while (torun) {
-                //Add the found ( index to the indexbox
-                indexbox.add(i);
-                //This loop will run unil it finds the closing ) or finds one more opening (
-                i+=1;
-                //Move one step further
-                //Check the option with nested expressions
-                if ((divided.get(i)).equals("(")) {
-                    //In case after the opening one we eventually find one more opening one
-                    //Just remove the part of the indexbox, so the first index would be the index with the last found (
-                    indexbox.clear();
+        try {
+            //remove the = sign
+            String log = text;
+            double ans = 0;
+            ArrayList divided = DividerbyAction(text);
+            //remove the = sign
+            if (divided.contains("=")) {divided.remove(0);}
+            ArrayList<Integer> indexbox = new ArrayList<>();
+            boolean torun = false;
+            //In case there are parenthasies - find the last parenthasies and calculate the expression inside them
+            for (int i = 0; i<divided.size(); i+=1) {
+                //In case while looping through the expression ( is found
+                if ((divided.get(i)).equals("(")) {torun = true;}
+                while (torun) {
+                    //Add the found ( index to the indexbox
+                    indexbox.add(i);
+                    //This loop will run unil it finds the closing ) or finds one more opening (
+                    i+=1;
+                    //Move one step further
+                    //Check the option with nested expressions
+                    if ((divided.get(i)).equals("(")) {
+                        //In case after the opening one we eventually find one more opening one
+                        //Just remove the part of the indexbox, so the first index would be the index with the last found (
+                        indexbox.clear();
+                    }
+                    //Check the option without nested expressions
+                    if ((divided.get(i)).equals(")")) {
+                        int left_bound = indexbox.get(1);
+                        int right_bound = i;
+                        //At this stage this is found (1*2) , the indexes are pointing to 1*2
+                        //Calculate this expression and turn it to double
+                        String expression = String.join("", divided.subList(left_bound,right_bound));
+                        double result = Double.parseDouble(String.valueOf(Calculate(expression)));
+                        //Add the expression that we've calculated to a string
+                        divided.set(left_bound-1,Double.toString(result));
+                        //Remove the initial expression from the string
+                        divided.subList(left_bound,right_bound+1).clear();
+                        text = String.join("",divided);
+                        //Clean the indexbox
+                        System.out.println("Current indexbox: " + indexbox);
+                        indexbox.clear();
+                        torun = false;
+                        //Pass further into the recursion loop
+                        double res = Double.parseDouble(Calculate(text));
+                        System.out.println("The following string extracted --> " + log.substring(left_bound,right_bound+1) + " from " + divided );
+                        return String.valueOf(res);
+                    }
                 }
-                //Check the option without nested expressions
-                if ((divided.get(i)).equals(")")) {
-                    int left_bound = indexbox.get(1);
-                    int right_bound = i;
-                    //At this stage this is found (1*2) , the indexes are pointing to 1*2
-                    //Calculate this expression and turn it to double
-                    String expression = String.join("", divided.subList(left_bound,right_bound));
-                    double result = Double.parseDouble(String.valueOf(Calculate(expression)));
-                    //Add the expression that we've calculated to a string
-                    divided.set(left_bound-1,Double.toString(result));
-                    //Remove the initial expression from the string
-                    divided.subList(left_bound,right_bound+1).clear();
-                    text = String.join("",divided);
-                    //Clean the indexbox
-                    System.out.println("Current indexbox: " + indexbox);
-                    indexbox.clear();
-                    torun = false;
-                    //Pass further into the recursion loop
-                    double res = Double.parseDouble(Calculate(text));
-                    System.out.println("The following string extracted --> " + log.substring(left_bound,right_bound+1) + " from " + divided );
-                    return String.valueOf(res);
-                }
-        }
-        }
-        //Return the result of a looper (array) turned into string and parse Double'ed after.
-        ans = Double.parseDouble(looper(divided).get(0).toString());
+            }
+            //Return the result of a looper (array) turned into string and parse Double'ed after.
+            ans = Double.parseDouble(looper(divided).get(0).toString());
 
-        return String.valueOf(ans);
+            return String.valueOf(ans);
+        } catch (Exception e){
+            throw new IllegalArgumentException("Invalid form");
+        }
+
     }
     //The Function that does: "1*1/875*2+8-9*12" -> [1, *, 1, /, 875, *, 2, +, 8, -, 9, *, 12]
     private static ArrayList<String> DividerbyAction(String text) {
