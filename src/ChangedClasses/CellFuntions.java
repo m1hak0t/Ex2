@@ -45,7 +45,7 @@ public class CellFuntions {
         //How formula can look like
         // 1+1,1+1*2/3, ((2*2+3)/2)*2
         double ans = 0;
-        if (text != null && !text.isEmpty() && !text.contains(" ")) {
+        if (text != null && !text.contains(" ")) {
             //Check if there are parenthasies
             try {
                 ans = Double.parseDouble(Calculate(text));

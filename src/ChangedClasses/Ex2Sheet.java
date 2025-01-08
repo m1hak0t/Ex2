@@ -5,36 +5,20 @@ import Interfaces.Sheet;
 import UnchangedClasses.Ex2Utils;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashSet;
+import java.util.Set;
 // Add your documentation below:
-
-/// TODO:1
-/// To finish the Scell class
-/// TODO:2 - The main idea of the system
-///
-/// <--->
-/// The function depth created a 2d array of cells so its size is WIDTHxLENGTH and gives every cell a specific value of -1
-/// The function eval() starts to loop through the depth 2d array and do the following:
-/// If the cell does not depend on eny other cell - calculate it, if it depends on other cells -> check whether all of them calculatable
-/// right now (depChecker()) and if yes -> calculate all of them and if not - wait to the next iteration. After every iteration we increase
-/// the value of every uncalculated cell by 1 and check whether any changes are made during the calculation. If the depths of some set of sells
-/// grows but nothing changed after the iteration -> these 2 cells have an infinite loop.
-/// </--->
-///
-/// TODO:3 - Write a depChecker
-///
-/// TODO:4
-/// Write depth algorithm, just go through the sheet and check whether the cell is calculatable, if yes - calculate.
-/// Do this loop and make sure every iteration something changed, if there are uncalculated cells and nothing chenges - this is a circle loop
 
 public class Ex2Sheet implements Sheet {
     public Cell[][] table;
+    // Add your code here
+
+    // ///////////////////
     public Ex2Sheet(int x, int y) {
         table = new SCell[x][y];
         for(int i=0;i<x;i=i+1) {
             for(int j=0;j<y;j=j+1) {
-                table[i][j] = new SCell("");
+                table[i][j] = new SCell(Ex2Utils.EMPTY_CELL);
             }
         }
         eval();
@@ -62,11 +46,10 @@ public class Ex2Sheet implements Sheet {
 
     @Override
     public Cell get(String cords) {
-        Cell ans = null;
-        // Add your code here
-
-        /////////////////////
-        return ans;
+        CellEntry cell = new CellEntry(cords);
+        int _x = cell.getX();
+        int _y = cell.getY();
+        return table[_x][_y];
     }
 
     @Override
@@ -85,62 +68,126 @@ public class Ex2Sheet implements Sheet {
 
         /////////////////////
     }
-
-
-    /// The most interesting one
-    /// Initiate the depth array with -1's
-    /// If there are no -1
     @Override
     public void eval() {
-        //Start the algo
-        //Initiate the basic depth sheet
-        //int[][] dd = depth();
-        int [][] ans = new int[width()][height()];
-        //ifchanged = false
-        //while
-        //ifchanged = false
-        //depth = 0
-        //while i < lenxheight
-        //cell.setdata = eval(cell.getdata(i))
-        //If evalstring returns Error or String -> update current cell depth to current depth
-        //ifchanged = true
-        //If evalstring returns null - continue the iteration
-        //depth += 1
-        //Continue while loop until
-        for (int x=0; x< width()*height();x++) {
-            //Iterations through the sheet
-            for (int i = 0; i< width();i++) {
-                for (int j = 0; j< width();j++) {
-                    System.out.println("Iteration through" + i + ", " + j);
-                    if (!table[i][j].getData().isEmpty()) {
-                        String data = eval(i, j);
-                        if (data == null) {
-                            /// /
-                        } else {
-                            System.out.println("Data inserted into" + "-> " + i + ", " + j);
-                            table[i][j].setData(data);
-                        }
-                    }
-                }
+        int[][] dd = depth();
+
+        for (int x=0;x<width();x=x+1) {
+            for (int y=0;y<height();y=y+1) {
+                table[x][y].setData(eval(x,y));
             }
         }
+        //printGrid(this.Depth());
+        //table[0][1].setData("A0*2");
+        //printGrid(this.Depth());
+        //table[0][2].setData("A1*2");
+        //printGrid(this.Depth());
+        //table[0][3].setData("A2*2");
+        //printGrid(this.Depth());
+    }
+    @Override
+    public int[][] depth() {
+        int[][] ans = Depth();
+        return ans;
     }
 
     @Override
     public boolean isIn(int xx, int yy) {
-        return xx >= 0 && xx < width() && yy >= 0 && yy < height();
+        boolean ans = xx>=0 && yy>=0;
+        // Add your code here
+
+        /////////////////////
+        return ans;
     }
 
-    //Created a 2d array of depth of each cell, after that we will change this array in the eval function
-    @Override
-    public int[][] depth() {
-        int[][] ans = new int[width()][height()];
-        for (int i=0; i<width(); i++) {
-            for (int j=0; j<height(); j++) {
-                ans[i][j] = -1;
+    public int[][] Depth() {
+        int width = this.width();
+        int height = this.height();
+
+        // Initialize depth matrix and helper arrays
+        int[][] depthMatrix = new int[width][height];
+        boolean[][] visited = new boolean[width][height];
+        boolean[][] inStack = new boolean[width][height];
+
+        // Fill depthMatrix with -1 to indicate uncomputed cells
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                depthMatrix[i][j] = -1;
             }
         }
-        return ans;
+
+        // Compute depth for each cell
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                if (depthMatrix[i][j] == -1) { // If depth is not already computed
+                    depthcheck(i, j, depthMatrix, visited, inStack);
+                }
+            }
+        }
+
+        return depthMatrix; // Return the completed depth matrix
+    }
+
+    public int depthcheck(int x, int y, int[][] depthMatrix, boolean[][] visited, boolean[][] inStack) {
+        // Base case: Check if the cell is valid in the table
+        if (!isIn(x, y)) return 0; // Cell is out of bounds, depth = 0
+
+        // If depth is already computed, return it
+        if (depthMatrix[x][y] != -1) return depthMatrix[x][y];
+
+        // Detect circular dependency by checking if the cell is already in the call stack
+        if (inStack[x][y]) {
+            // Circular dependency found, mark this cell's depth as -1
+            depthMatrix[x][y] = -1;
+            return -1;
+        }
+
+        // Mark the cell as visited and part of the recursion stack
+        visited[x][y] = true;
+        inStack[x][y] = true;
+
+        // Parse the cell's formula to get its dependencies
+        Set<String> dependencies = parseDependencies(get(x, y).getData());
+
+        int maxDependencyDepth = 0;
+
+        // Recursive DFS on all dependencies of the current cell
+        for (String dep : dependencies) {
+            // Convert dependency (e.g., "A1") into coordinates (x, y)
+            Cell dependentCell = get(dep);
+            if (dependentCell == null) {
+                // Skip if the dependent cell is invalid (e.g., out of bounds or empty)
+                continue;
+            }
+            System.out.println(dependentCell.toString());
+            CellEntry cell = new CellEntry(dep);
+            int depX = cell.getX(); // X-coordinate of the dependency
+            int depY = cell.getY(); // Y-coordinate of the dependency
+
+            int dependentDepth = depthcheck(depX, depY, depthMatrix, visited, inStack);
+
+            // If a circular dependency is encountered, propagate the failure (-1)
+            if (dependentDepth == -1) {
+                depthMatrix[x][y] = -1;
+                inStack[x][y] = false; // Remove from the recursion stack before returning
+                return -1;
+            }
+
+            // Update the maximum dependency depth
+            maxDependencyDepth = Math.max(maxDependencyDepth, dependentDepth);
+        }
+
+        // The depth of the current cell is 1 + max of its dependencies
+        depthMatrix[x][y] = maxDependencyDepth + 1;
+
+        // Remove the cell from the recursion stack
+        inStack[x][y] = false;
+        for (x=0 ; x < x ; x = x + 1) {
+            for (y=0;y<y;y=y+1) {
+               System.out.println(depthMatrix[x][y]);
+            }
+        }
+        return depthMatrix[x][y];
     }
 
     @Override
@@ -158,87 +205,77 @@ public class Ex2Sheet implements Sheet {
     }
 
 
-    /// The function that we will use in a future to define what will happen in one particular cell
     @Override
     public String eval(int x, int y) {
-        String data = null;
-        if(get(x,y)!=null)
-        {data = get(x,y).toString();}
-        //What should be done
-        //depCheck the string
-        //If there is an exception -> return ERR.Form
-        //If there is no exception -> return Calculated form
-        try {
-            data = depChecker(data);
-            return data;
-
-        } catch (IllegalArgumentException e) {
-            //In case something gave an invalid argument exception - return an error
-            return Ex2Utils.ERR_FORM;
-        }
-    }
-
-
-    ///Takes an expression as a string and checks whether it's dependencies are instantly calculatable
-    ///If no - returns Null
-    ///If yes - returns a string with the expression already calculated inside (recursive call)
-    /// If the dependencies are uncalculatable types (Strings, Errors) throws an argument exception
-    public String depChecker(String expression) {
-
-        int count = 0;
-        //RegEx to find coordinates like A5
-        Pattern pattern = Pattern.compile("[A-Z]+[0-9]+");
-        Matcher matcher = pattern.matcher(expression);
-        //Now we will update all the expressions we have found and also count them!
-
-        //While loop until there is no matches left
-        if (matcher.find()) {
-            //Initialise new expression to change
-            StringBuilder newexpression = new StringBuilder(expression);
-            String coords = matcher.group();
-            System.out.println("Dependency found -->" + coords);
-            //Calculate the expression in the desired cell
-            CellEntry cell = new CellEntry(coords);
-            //Get the coordinates of the current cell
-            int x = cell.getX();
-            int y = cell.getY();
-            if (!isIn(x,y)) {
-                throw new IllegalArgumentException("Cell " + cell.toString() + "is out of range");
-            }
-            //Get the string that is located there
-            //rekcirbleahcim
-            Cell currentcell = this.table[x][y];
-            System.out.println(currentcell.getType());
-            System.out.println(currentcell.getData());
-            //If there is an error inside = throw an exception of illigal argument
-            if (currentcell.getData().equals(Ex2Utils.ERR_FORM) || currentcell.getData().equals(Ex2Utils.ERR_CYCLE)) {
-                throw new IllegalArgumentException("One of the dependencies is an error");
-            }
-            //Only if the datatype is calculatable we want to calculate the cell
-            if (currentcell.getType() == 2 || currentcell.getType() == 3) {
-                //First and last index of the found data:
-                int first = matcher.start();
-                int last = matcher.end();
-                //Caclulated form can give an error in case we are dividing by 0 - catch that
-                String calculated = null;
-                try {
-                    //Get the datastring from the dependant cell
-                    String current_expression = currentcell.getData();
-                    String calculated_expression = String.valueOf(CellFuntions.ComputeForm(current_expression));
-                    calculated = calculated_expression;
-                } catch (Exception e) {
-                    //Set en errormessage in the uncalculatable cell in case its uncalculatable instantly
-                    return null;
-                }
-                newexpression.replace(first, last, calculated);
-                //Set the expression string== to newexpression that we've changes
-                expression = newexpression.toString();
-                //Recursive call of the function with the new data
-                return depChecker(expression);
-            } else {
-                throw new IllegalArgumentException("The dependant cell" + cell.toString()+ " is uncalculatable");
+        String ans = null;
+        if(get(x,y)!=null) {
+            try {
+                ans = String.valueOf(CellFuntions.ComputeForm(get(x,y).toString()));
+            } catch (Exception e) {
+                throw new IllegalArgumentException(e);
             }
         }
-        return CellFuntions.Calculate(expression);
+        return ans;
     }
+
+    // Helper function to parse dependencies from a formula
+    public Set<String> parseDependencies(String formula) {
+        Set<String> dependencies = new HashSet<>();
+
+        // Example parsing: Find all cell references like "A1", "B2", etc.
+        // Customize this regex based on your formula syntax
+        String regex = "[A-Za-z][0-9]+";
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
+        java.util.regex.Matcher matcher = pattern.matcher(formula);
+
+        while (matcher.find()) {
+            dependencies.add(matcher.group());
+        }
+
+        return dependencies;
+    }
+
+    // Method to determine if a cell is calculatable
+    public boolean isCalculatable(String cords) {
+        CellEntry cellEntry = new CellEntry(cords); // Parse coordinates, e.g., A1 -> (0,0)
+        int x = cellEntry.getX();
+        int y = cellEntry.getY();
+
+        Cell cell = table[x][y];
+
+        if (cell.getData().equals(Ex2Utils.EMPTY_CELL)) {
+            return true;
+        }
+
+        // Parse formula to get dependencies
+        Set<String> dependencies = parseDependencies(cell.getData());
+        for (String dep : dependencies) {
+            CellEntry dependencyEntry = new CellEntry(dep); // Parse dependency coordinates
+            int depX = dependencyEntry.getX();
+            int depY = dependencyEntry.getY();
+
+            Cell dependencyCell = table[depX][depY];
+            CellEntry cellentry = new CellEntry(depX, depY);
+            if (parseDependencies(dependencyCell.getData()).size()!=0) {
+                System.out.println("Dependency " + cellentry.toString() +" is not empty");
+                // Unresolved dependency, so cell is not calculatable
+                return false;
+            }
+        }
+
+        // All dependencies are calculated
+        return true;
+    }
+
+    // Utility to print the current state of the grid
+    private void printGrid(int[][] grid) {
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                System.out.printf("%4d", grid[i][j]); // Print each element with padding for readability
+            }
+            System.out.println(); // Newline after each row
+        }
+        System.out.println(); // Extra newline for better separation
+    }
+
 }

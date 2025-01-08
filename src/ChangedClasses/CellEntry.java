@@ -53,17 +53,12 @@ public class CellEntry implements Index2D {
 
     @Override
     public String toString() {
-        if (stringindex!=null) {
-            return stringindex;
+        // Safe retrieval of grid[_x][_y], ensuring indices are within bounds
+        if (_x >= 0 && _x < Ex2Utils.WIDTH && _y >= 0 && _y < Ex2Utils.HEIGHT) {
+            return grid[_x][_y];
+        } else {
+            throw new IllegalStateException("CellEntry coordinates are out of bounds: " + _x + ", " + _y);
         }
-        for (int x=0; x< Ex2Utils.WIDTH;x ++) {
-            for (int y=0;y<Ex2Utils.HEIGHT; y++) {
-                char letter = (char)(x+65);
-                this.grid[x][y] = String.valueOf((letter))+y;
-            }
-
-        }
-        return grid[_x][_y];
     }
 
     public ArrayList<Integer> toCords() {

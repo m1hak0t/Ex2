@@ -142,7 +142,9 @@ public class Ex2GUI {
 			else {
 				table.set(xx, yy, c);
 				int[][] calc_d = table.depth();
+				System.out.println("Insertion in  " + xx + " " + yy);
 				if (calc_d[xx][yy] == Ex2Utils.ERR) {
+					System.out.println("Inserted in  " + xx + " " + yy);
 					table.get(xx,yy).setType(Ex2Utils.ERR_CYCLE_FORM);
 				}
 			}
