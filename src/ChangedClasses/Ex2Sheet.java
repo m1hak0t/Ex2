@@ -5,15 +5,19 @@ import Interfaces.Sheet;
 import UnchangedClasses.Ex2Utils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import static ChangedClasses.CellFuntions.*;
 // Add your documentation below:
 
 public class Ex2Sheet implements Sheet {
-    public Cell[][] table;
-    // Add your code here
 
-    // ///////////////////
+
+    public SCell[][] table;
+
+
     public Ex2Sheet(int x, int y) {
         table = new SCell[x][y];
         for(int i=0;i<x;i=i+1) {
@@ -62,23 +66,28 @@ public class Ex2Sheet implements Sheet {
     }
     @Override
     public void set(int x, int y, String s) {
-        Cell c = new SCell(s);
-        table[x][y] = c;
-        // Add your code here
-
-        /////////////////////
+        table[x][y].setData(s);
+        eval();
     }
     @Override
     public void eval() {
-        int[][] dd = depth();
 
-        for (int x=0;x<width();x=x+1) {
-            for (int y=0;y<height();y=y+1) {
-                table[x][y].setData(eval(x,y));
+        int[][] dd = depth();
+        //Iterate until the biggest depth comes
+        for (int q =0;q< findMaxInteger(dd)+1;q=q+1) {
+            //Iterate through depth and calculate
+            for (int x = 0; x < width(); x = x + 1) {
+                for (int y = 0; y < height(); y = y + 1) {
+                    if (dd[x][y]==q) {
+                        CellEntry cell = new CellEntry(x, y);
+                        table[x][y].setData(eval(x, y));
+                    }
+                }
+
             }
         }
         //printGrid(this.Depth());
-        //table[0][1].setData("A0*2");
+        //table[0][0].setData("A1");
         //printGrid(this.Depth());
         //table[0][2].setData("A1*2");
         //printGrid(this.Depth());
@@ -210,7 +219,7 @@ public class Ex2Sheet implements Sheet {
         String ans = null;
         if(get(x,y)!=null) {
             try {
-                ans = String.valueOf(CellFuntions.ComputeForm(get(x,y).toString()));
+                ans = String.valueOf(computeForm(x,y));
             } catch (Exception e) {
                 throw new IllegalArgumentException(e);
             }
@@ -278,4 +287,90 @@ public class Ex2Sheet implements Sheet {
         System.out.println(); // Extra newline for better separation
     }
 
+    public String computeForm(int x, int y) {
+        // Check if the cell exists within the bounds of the spreadsheet
+        if (!isIn(x, y)) return "ERROR: Out of bounds";
+
+
+        // Retrieve the cell
+        Cell cell = get(x, y);
+
+        if (cell == null) return "ERROR: Undefined cell";
+        String data = cell.getData();
+        if (data!=""){
+            System.out.println("To evaluate :" + cell.toString());
+        }
+        if (table[x][y].formula != null) {
+            System.out.println("Formula cell");
+            data = table[x][y].formula;
+        } else {
+            data = cell.getData();}
+
+        // Handle cases based on cell type
+        if (IsNumber(data)) {
+            // If the cell is a number, return it as a string
+            return data;
+        } else if (IsText(data)) {
+            // If the cell is text, return it directly
+            return data;
+        } else if (IsForm(data)) {
+            // If the cell is a formula:
+
+            // Parse dependencies (e.g., "=A1 + B2" should extract A1 and B2)
+            Set<String> dependencies = parseDependencies(data);
+
+            // Resolve dependencies and replace them with their actual values
+            String formulaToEvaluate = data.substring(1); // Remove the "=" at the start
+            for (String dep : dependencies) {
+                // Convert cell reference (e.g., "A1") to coordinates
+                Cell depCell = get(dep);
+                if (depCell == null) return "ERROR: Invalid cell reference (" + dep + ")";
+                CellEntry depEntry = new CellEntry(dep);
+                int depX = depEntry.getX();
+                int depY = depEntry.getY();
+
+                // Recursively compute the value of the dependency
+                String depValue = computeForm(depX, depY);
+
+                // If the dependency is text or results in an error, propagate the error
+                if (IsText(depValue) || depValue.startsWith("ERROR")) {
+                    return "ERROR: Invalid dependency in cell " + dep;
+                }
+
+                // Replace the dependency reference in the formula with its computed value
+                formulaToEvaluate = formulaToEvaluate.replace(dep, depValue);
+            }
+
+            // Evaluate the formula using the calculate() method
+            try {
+                String result = CellFuntions.Calculate((formulaToEvaluate));
+                return result;
+            } catch (Exception e) {
+                return "ERROR: Calculation error in cell (" + x + "," + y + ")";
+            }
+        }
+
+        // Unknown type or invalid content empty cell
+        return Ex2Utils.EMPTY_CELL;
+    }
+
+    public static int findMaxInteger(int[][] array) {
+        // Initialize max with the smallest possible integer
+        int max = Integer.MIN_VALUE;
+
+        // Iterate over all rows
+        for (int[] row : array) {
+            // Iterate over all elements in the current row
+            for (int value : row) {
+                // Update max if the current value is greater
+                if (value > max) {
+                    max = value;
+                }
+            }
+        }
+
+        return max;
+    }
 }
+
+

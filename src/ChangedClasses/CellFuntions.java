@@ -40,7 +40,7 @@ public class CellFuntions {
         // It's text if it's not a number and not a formula
         return !IsNumber(s) && !IsForm(s);
     }
-
+/*
     public static double ComputeForm(String text) throws Exception {
         //How formula can look like
         // 1+1,1+1*2/3, ((2*2+3)/2)*2
@@ -55,7 +55,7 @@ public class CellFuntions {
         } else throw new IllegalArgumentException("Invalid formula format");
         return ans;
     }
-
+*/
     //The function does this: "1*1/((875*2)+8-9*12)" -> 334 recursively untily gets rid of all the parenthasies
     public static String Calculate(String text) {
         if (text.equals("") || text==null) {

@@ -2,6 +2,8 @@ package ChangedClasses;// Add your documentation below:
 
 import Interfaces.Cell;
 
+import java.util.Optional;
+
 
 //Types list for scell
 //String = 1
@@ -11,9 +13,12 @@ public class SCell implements Cell {
     private String line;
     private int type;
     public int depth;
-    public boolean dependant = false;
-    public boolean calculatable;
+    public String formula;
 
+
+    public String getFormula() {
+        return formula;
+    }
     public SCell(String s) {
         setData(s);
     }
@@ -27,13 +32,14 @@ public class SCell implements Cell {
     //@Override
     @Override
     public String toString() {
-        return getData();
+        return line;
     }
 
     @Override
     public void setData(String s) {
         line = s;
-
+        if (this.formula!= null)
+            System.out.println(formula);
         //If the cell is a string - set type string
         if (CellFuntions.IsText(line)) {
             this.type = 1;
@@ -46,6 +52,7 @@ public class SCell implements Cell {
         }
         //If the cell is a formula - set type formula
         if (CellFuntions.IsForm(line)) {
+            this.formula = this.line; ///Critical line!
             this.type = 3;
         } else {
         }
