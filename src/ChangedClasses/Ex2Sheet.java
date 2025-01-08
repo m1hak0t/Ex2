@@ -86,14 +86,19 @@ public class Ex2Sheet implements Sheet {
 
             }
         }
-        //printGrid(this.Depth());
-        //table[0][0].setData("A1");
-        //printGrid(this.Depth());
-        //table[0][2].setData("A1*2");
-        //printGrid(this.Depth());
-        //table[0][3].setData("A2*2");
-        //printGrid(this.Depth());
-    }
+        //Itarate in case there are -1
+            //Iterate through depth and calculate
+            for (int x = 0; x < width(); x = x + 1) {
+                for (int y = 0; y < height(); y = y + 1) {
+                    if (dd[x][y]==-1) {
+                        CellEntry cell = new CellEntry(x, y);
+                        table[x][y].setData(Ex2Utils.ERR_CYCLE);
+                    }
+                }
+
+
+            }
+        }
     @Override
     public int[][] depth() {
         int[][] ans = Depth();
@@ -221,7 +226,7 @@ public class Ex2Sheet implements Sheet {
             try {
                 ans = String.valueOf(computeForm(x,y));
             } catch (Exception e) {
-                throw new IllegalArgumentException(e);
+                ans = Ex2Utils.ERR_FORM;
             }
         }
         return ans;
@@ -295,7 +300,7 @@ public class Ex2Sheet implements Sheet {
         // Retrieve the cell
         Cell cell = get(x, y);
 
-        if (cell == null) return "ERROR: Undefined cell";
+        if (cell == null) return Ex2Utils.ERR_FORM;
         String data = cell.getData();
         if (data!=""){
             System.out.println("To evaluate :" + cell.toString());
@@ -324,7 +329,7 @@ public class Ex2Sheet implements Sheet {
             for (String dep : dependencies) {
                 // Convert cell reference (e.g., "A1") to coordinates
                 Cell depCell = get(dep);
-                if (depCell == null) return "ERROR: Invalid cell reference (" + dep + ")";
+                if (depCell == null) return "ERR: (" + dep + ")";
                 CellEntry depEntry = new CellEntry(dep);
                 int depX = depEntry.getX();
                 int depY = depEntry.getY();
@@ -334,7 +339,7 @@ public class Ex2Sheet implements Sheet {
 
                 // If the dependency is text or results in an error, propagate the error
                 if (IsText(depValue) || depValue.startsWith("ERROR")) {
-                    return "ERROR: Invalid dependency in cell " + dep;
+                    return "ERR:" + dep;
                 }
 
                 // Replace the dependency reference in the formula with its computed value
