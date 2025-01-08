@@ -6,6 +6,7 @@ The **Ex22 Project** is designed to work on core functionalities related to spre
 This project is written in **Java** using **Java SDK 23.0.1** and is compatible with IntelliJ IDEA 2024. The aim is to implement a robust system for handling spreadsheet operations.
 
 
+![WhatsApp Image 2025-01-08 at 23 23 40_10e60cd8](https://github.com/user-attachments/assets/94c814f8-439c-4c1a-94ab-00cbcd722f4e)
 
 ## Project Structure
 Here is an overview of the project structure:---
