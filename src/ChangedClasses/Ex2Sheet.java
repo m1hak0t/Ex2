@@ -4,13 +4,30 @@ import Interfaces.Cell;
 import Interfaces.Sheet;
 import UnchangedClasses.Ex2Utils;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 
 import static ChangedClasses.CellFuntions.*;
-// Add your documentation below:
+import static java.lang.reflect.Array.set;
+
+/**
+ * The Ex2Sheet class implements the Sheet interface, providing
+ * a two-dimensional table structure to represent a spreadsheet.
+ * Each cell in the table is stored as an instance of the SCell class.
+ *
+ * <p>This class supports basic spreadsheet operations such as:
+ * - Accessing and modifying cell values.
+ * - Evaluating cell formulas.
+ * - Loading and saving the spreadsheet state to/from a file.
+ * - Managing cell dependencies for formulas.
+ *
+ * <p>Key Features:
+ * - Variable-sized table representation.
+ * - Formula parsing with dependency checks.
+ * - Depth analysis for circular dependencies.
+ * - Utility methods for conversions and debugging.
+ */
 
 public class Ex2Sheet implements Sheet {
 
@@ -20,13 +37,15 @@ public class Ex2Sheet implements Sheet {
 
     public Ex2Sheet(int x, int y) {
         table = new SCell[x][y];
-        for(int i=0;i<x;i=i+1) {
-            for(int j=0;j<y;j=j+1) {
+        for (int i = 0; i < x; i = i + 1) {
+            for (int j = 0; j < y; j = j + 1) {
                 table[i][j] = new SCell(Ex2Utils.EMPTY_CELL);
             }
         }
+
         eval();
     }
+
     public Ex2Sheet() {
         this(Ex2Utils.WIDTH, Ex2Utils.HEIGHT);
     }
@@ -36,8 +55,10 @@ public class Ex2Sheet implements Sheet {
         String ans = Ex2Utils.EMPTY_CELL;
         // Add your code here
 
-        Cell c = get(x,y);
-        if(c!=null) {ans = c.toString();}
+        Cell c = get(x, y);
+        if (c != null) {
+            ans = c.toString();
+        }
 
         /////////////////////
         return ans;
@@ -60,25 +81,28 @@ public class Ex2Sheet implements Sheet {
     public int width() {
         return table.length;
     }
+
     @Override
     public int height() {
         return table[0].length;
     }
+
     @Override
     public void set(int x, int y, String s) {
         table[x][y].setData(s);
         eval();
     }
+
     @Override
     public void eval() {
 
         int[][] dd = depth();
         //Iterate until the biggest depth comes
-        for (int q =0;q< findMaxInteger(dd)+1;q=q+1) {
+        for (int q = 0; q < findMaxInteger(dd) + 1; q = q + 1) {
             //Iterate through depth and calculate
             for (int x = 0; x < width(); x = x + 1) {
                 for (int y = 0; y < height(); y = y + 1) {
-                    if (dd[x][y]==q) {
+                    if (dd[x][y] == q) {
                         CellEntry cell = new CellEntry(x, y);
                         table[x][y].setData(eval(x, y));
                     }
@@ -87,18 +111,19 @@ public class Ex2Sheet implements Sheet {
             }
         }
         //Itarate in case there are -1
-            //Iterate through depth and calculate
-            for (int x = 0; x < width(); x = x + 1) {
-                for (int y = 0; y < height(); y = y + 1) {
-                    if (dd[x][y]==-1) {
-                        CellEntry cell = new CellEntry(x, y);
-                        table[x][y].setData(Ex2Utils.ERR_CYCLE);
-                    }
+        //Iterate through depth and calculate
+        for (int x = 0; x < width(); x = x + 1) {
+            for (int y = 0; y < height(); y = y + 1) {
+                if (dd[x][y] == -1) {
+                    CellEntry cell = new CellEntry(x, y);
+                    table[x][y].setData(Ex2Utils.ERR_CYCLE);
                 }
-
-
             }
+
+
         }
+    }
+
     @Override
     public int[][] depth() {
         int[][] ans = Depth();
@@ -107,7 +132,7 @@ public class Ex2Sheet implements Sheet {
 
     @Override
     public boolean isIn(int xx, int yy) {
-        boolean ans = xx>=0 && yy>=0;
+        boolean ans = xx >= 0 && yy >= 0;
         // Add your code here
 
         /////////////////////
@@ -196,9 +221,9 @@ public class Ex2Sheet implements Sheet {
 
         // Remove the cell from the recursion stack
         inStack[x][y] = false;
-        for (x=0 ; x < x ; x = x + 1) {
-            for (y=0;y<y;y=y+1) {
-               System.out.println(depthMatrix[x][y]);
+        for (x = 0; x < x; x = x + 1) {
+            for (y = 0; y < y; y = y + 1) {
+                System.out.println(depthMatrix[x][y]);
             }
         }
         return depthMatrix[x][y];
@@ -206,25 +231,100 @@ public class Ex2Sheet implements Sheet {
 
     @Override
     public void load(String fileName) throws IOException {
-        // Add your code here
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            int rowIndex = 0;
 
-        /////////////////////
+            // Iterate over rows in the file
+            while ((line = reader.readLine()) != null) {
+                // Split the line into cells by commas, handling escaped characters
+                String[] cells = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+
+                if (table.length <= rowIndex || table[0].length < cells.length) {
+                    throw new IOException("File dimensions do not match sheet dimensions.");
+                }
+
+                // Add the parsed values into the table row
+                for (int colIndex = 0; colIndex < cells.length; colIndex++) {
+                    String cellValue = cells[colIndex];
+
+                    // Remove quotes if the value was escaped
+                    if (cellValue.startsWith("\"") && cellValue.endsWith("\"")) {
+                        cellValue = cellValue.substring(1, cellValue.length() - 1).replace("\"\"", "\"");
+                    }
+
+                    // Set data to the table
+                    table[rowIndex][colIndex].setData(cellValue);
+                }
+
+                rowIndex++;
+            }
+
+            // Check if the number of lines matches the height of the table
+            if (rowIndex > table.length) {
+                throw new IOException("File contains more rows than sheet dimensions allow.");
+            }
+        }
+
+        // Recalculate values after loading
+        eval();
     }
 
     @Override
     public void save(String fileName) throws IOException {
-        // Add your code here
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            // Iterate over the rows in the sheet
+            for (int i = 0; i < table.length; i++) {
+                StringBuilder row = new StringBuilder();
 
-        /////////////////////
+                // Iterate over the cells in each row
+                for (int j = 0; j < table[i].length; j++) {
+                    Cell cell = table[i][j];
+
+                    // Use the cell's content (either formula, value, etc.)
+                    String cellValue;
+                    if (cell instanceof SCell) {
+                        SCell scell = (SCell) cell;
+                        if (scell.getFormula() != null) {
+                            // Save the formula if it exists
+                            cellValue = scell.getFormula();
+                        } else {
+                            // Save the evaluated value or the raw content
+                            cellValue = scell.toString();
+                        }
+                    } else {
+                        // General fallback for Cell objects
+                        cellValue = cell.toString();
+                    }
+
+                    // Add the cell content to the row with escaping logic if needed
+                    if (cellValue.contains(",") || cellValue.contains("\"")) {
+                        // Escape special characters
+                        cellValue = "\"" + cellValue.replace("\"", "\"\"") + "\"";
+                    }
+
+                    row.append(cellValue);
+
+                    // Add a comma unless it's the last cell in the row
+                    if (j < table[i].length - 1) {
+                        row.append(",");
+                    }
+                }
+
+                // Write the completed row into the file
+                writer.write(row.toString());
+                writer.newLine();
+            }
+        }
+        System.out.println("Sheet successfully saved to " + fileName);
     }
-
 
     @Override
     public String eval(int x, int y) {
         String ans = null;
-        if(get(x,y)!=null) {
+        if (get(x, y) != null) {
             try {
-                ans = String.valueOf(computeForm(x,y));
+                ans = String.valueOf(computeForm(x, y));
             } catch (Exception e) {
                 ans = Ex2Utils.ERR_FORM;
             }
@@ -270,8 +370,8 @@ public class Ex2Sheet implements Sheet {
 
             Cell dependencyCell = table[depX][depY];
             CellEntry cellentry = new CellEntry(depX, depY);
-            if (parseDependencies(dependencyCell.getData()).size()!=0) {
-                System.out.println("Dependency " + cellentry.toString() +" is not empty");
+            if (parseDependencies(dependencyCell.getData()).size() != 0) {
+                System.out.println("Dependency " + cellentry.toString() + " is not empty");
                 // Unresolved dependency, so cell is not calculatable
                 return false;
             }
@@ -302,14 +402,15 @@ public class Ex2Sheet implements Sheet {
 
         if (cell == null) return Ex2Utils.ERR_FORM;
         String data = cell.getData();
-        if (data!=""){
+        if (data != "") {
             System.out.println("To evaluate :" + cell.toString());
         }
         if (table[x][y].formula != null) {
             System.out.println("Formula cell");
             data = table[x][y].formula;
         } else {
-            data = cell.getData();}
+            data = cell.getData();
+        }
 
         // Handle cases based on cell type
         if (IsNumber(data)) {
@@ -376,6 +477,8 @@ public class Ex2Sheet implements Sheet {
 
         return max;
     }
+
+
 }
 
 

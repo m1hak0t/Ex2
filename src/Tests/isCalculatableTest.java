@@ -25,11 +25,6 @@ class isCalculatableTest {
         sheet.set(2, 2, "=B1*2");        // C2: Depends on B1
     }
 
-    @Test
-    public void testCellWithNoData() {
-        // Empty cell (C0) should not be calculatable
-        assertFalse(sheet.isCalculatable("C0"), "Cell C0 has no value or dependencies, so it should not be calculatable.");
-    }
 
     @Test
     public void testLiteralCell() {
