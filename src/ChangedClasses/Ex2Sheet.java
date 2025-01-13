@@ -90,6 +90,7 @@ public class Ex2Sheet implements Sheet {
     @Override
     public void set(int x, int y, String s) {
         table[x][y].setData(s);
+        printGrid(depth());
         eval();
     }
 
@@ -190,7 +191,7 @@ public class Ex2Sheet implements Sheet {
 
         int maxDependencyDepth = 0;
 
-        // Recursive DFS on all dependencies of the current cell
+        // Recursive  on all dependencies of the current cell
         for (String dep : dependencies) {
             // Convert dependency (e.g., "A1") into coordinates (x, y)
             Cell dependentCell = get(dep);
